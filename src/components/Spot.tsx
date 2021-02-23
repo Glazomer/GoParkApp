@@ -52,7 +52,7 @@ export function Spot({ id, start, end, selected, style, ...props }: SpotType) {
 
 const styles = StyleSheet.create({
   base: {
-    height: 150,
+    height: 140,
     padding: 10,
     borderWidth: 2,
     borderColor: '#5B6E9D',

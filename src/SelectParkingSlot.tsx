@@ -1,71 +1,37 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Button,
-  FlatList,
-  StyleSheet,
-  useWindowDimensions,
-} from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 // @ts-ignore
 import DialogInput from 'react-native-dialog-input';
 
 import { Spot } from './components';
 
-const now = Date.now();
-const getRand = (n: number) => Math.floor(Math.random() * n);
-const presets = [
-  () => ({ start: now, end: now }),
-  (r = getRand(45e4)) => ({
-    start: now + r - (getRand(3) + 1) * 36e5,
-    end: now + r,
-  }),
-  (r = getRand(18e5) + 45e4) => ({
-    start: now + r - (getRand(3) + 1) * 36e5,
-    end: now + r,
-  }),
-];
+import { StackParamList } from '../App';
+import { getCols, Context } from '../src/reducer';
 
-const makeSpots = (n: number) =>
-  new Array(n).fill(0).map(() => presets[Math.floor(Math.random() * 3)]());
+type ProfileScreenNavigationProp = StackNavigationProp<
+  StackParamList,
+  'SelectParkingSlot'
+>;
+export type SelectParkingSlotType = { navigation: ProfileScreenNavigationProp };
 
-export type SelectParkingSlotType = {};
-
-export function SelectParkingSlot({ ...props }: SelectParkingSlotType) {
-  const cols = useWindowDimensions().width > 480 ? 5 : 3;
-  const [spots, setSpots] = useState(makeSpots(cols * 2));
-  const [selected, setSelected] = useState<number | null>(null);
-
+export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
+  const [{ spots, selected }, dispatch] = useContext(Context);
   const [disabled, setDisabled] = useState(false);
+
   function ResetBtn() {
     setDisabled(true);
-    setTimeout(() => setDisabled(false), 1e3);
-    setSelected(null);
-    setSpots(makeSpots(cols * 2));
+    setTimeout(() => setDisabled(false), 500);
+    dispatch({ type: 'reset' });
   }
 
   const [promptId, setPromptId] = useState<number | null>(null);
   function HandleSubmit(submit: string) {
     const hours = parseInt(submit);
-    if (promptId && 1 <= hours && hours <= 3) {
-      const now = Date.now();
-      spots[promptId] = { start: now, end: now + hours * 36e5 };
 
-      const spotsSerialized = JSON.stringify(spots);
-      setSpots(JSON.parse(spotsSerialized));
-      setSelected(promptId);
+    if (promptId !== null && 1 <= hours && hours <= 3) {
+      dispatch({ type: 'select', id: promptId, hours });
       setPromptId(null);
-    }
-  }
-
-  function CancelSelected() {
-    if (selected) {
-      const now = Date.now();
-      spots[selected] = { start: now, end: now };
-
-      const spotsSerialized = JSON.stringify(spots);
-      setSpots(JSON.parse(spotsSerialized));
-      setSelected(null);
     }
   }
 
@@ -80,7 +46,13 @@ export function SelectParkingSlot({ ...props }: SelectParkingSlotType) {
         textInputProps={{ keyboardType: 'number-pad' }}
       />
       <Button
-        title='Reset to another parking'
+        title='My booked parking'
+        onPress={() => navigation.navigate('MyBookedParking')}
+        disabled={selected === null}
+      />
+      <View style={styles.delimiter} />
+      <Button
+        title='Shuffle random parking'
         onPress={ResetBtn}
         disabled={disabled}
       />
@@ -98,20 +70,34 @@ export function SelectParkingSlot({ ...props }: SelectParkingSlotType) {
               style={styles.spot}
             />
           )}
-          numColumns={cols}
+          numColumns={getCols()}
           style={styles.list}
         />
         <Text style={[styles.door, { alignSelf: 'flex-end' }]}>Enter</Text>
       </View>
-
-      <Button title='Cancel my parking' onPress={CancelSelected} />
+      <Button
+        title='Cancel my booking'
+        onPress={() => dispatch({ type: 'unselect' })}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  parking: { width: '100%', margin: 10, flexDirection: 'row' },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  parking: {
+    backgroundColor: '#423F3C',
+    width: '100%',
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    flexDirection: 'row',
+  },
   list: { margin: 10 },
   spot: { flex: 1 },
   door: {
@@ -126,4 +112,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#5B6E9D',
   },
+  delimiter: { height: 20 },
 });

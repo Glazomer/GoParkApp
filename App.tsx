@@ -1,23 +1,45 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet } from 'react-native';
+import 'react-native-gesture-handler';
+import React, { useReducer } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import { SelectParkingSlot } from './src';
+import {
+  SelectParkingSlot,
+  MyBookedParking,
+  SuccessfullyBooked,
+  NavigateEntryA,
+  NavigateEntryB,
+} from './src';
+
+import { initialState, reducer, Context } from './src/reducer';
+
+export type StackParamList = {
+  SelectParkingSlot: undefined;
+  MyBookedParking: undefined;
+  SuccessfullyBooked: undefined;
+  NavigateEntryA: undefined;
+  NavigateEntryB: undefined;
+};
+const Stack = createStackNavigator<StackParamList>();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <StatusBar style='auto' />
-      <SelectParkingSlot />
-    </View>
+    <Context.Provider value={useReducer(reducer, initialState)}>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name='SelectParkingSlot'
+            component={SelectParkingSlot}
+          />
+          <Stack.Screen name='MyBookedParking' component={MyBookedParking} />
+          <Stack.Screen
+            name='SuccessfullyBooked'
+            component={SuccessfullyBooked}
+          />
+          <Stack.Screen name='NavigateEntryA' component={NavigateEntryA} />
+          <Stack.Screen name='NavigateEntryB' component={NavigateEntryB} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Context.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
