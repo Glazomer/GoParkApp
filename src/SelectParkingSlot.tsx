@@ -7,7 +7,13 @@ import DialogInput from 'react-native-dialog-input';
 import { Spot } from './components';
 
 import { StackParamList } from '../App';
-import { getCols, Context } from '../src/reducer';
+import {
+  Context,
+  selectSpot,
+  unselectSpot,
+  resetSpots,
+  getCols,
+} from '../src/firebase';
 
 type ProfileScreenNavigationProp = StackNavigationProp<
   StackParamList,
@@ -16,22 +22,22 @@ type ProfileScreenNavigationProp = StackNavigationProp<
 export type SelectParkingSlotType = { navigation: ProfileScreenNavigationProp };
 
 export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
-  const [{ spots, selected }, dispatch] = useContext(Context);
+  const { spots, selected } = useContext(Context);
   const [disabled, setDisabled] = useState(false);
 
   function ResetBtn() {
     setDisabled(true);
+    resetSpots();
     setTimeout(() => setDisabled(false), 500);
-    dispatch({ type: 'reset' });
   }
 
   const [promptId, setPromptId] = useState<number | null>(null);
+
   function HandleSubmit(submit: string) {
     const hours = parseInt(submit);
-
     if (promptId !== null && 1 <= hours && hours <= 3) {
-      dispatch({ type: 'select', id: promptId, hours });
       setPromptId(null);
+      selectSpot(promptId, hours);
     }
   }
 
@@ -48,7 +54,7 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
       <Button
         title='My booked parking'
         onPress={() => navigation.navigate('MyBookedParking')}
-        disabled={selected === null}
+        disabled={selected === undefined}
       />
       <View style={styles.delimiter} />
       <Button
@@ -61,9 +67,10 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
         <FlatList
           data={spots}
           keyExtractor={(_, i) => i.toString()}
-          renderItem={({ item, index }) => (
+          renderItem={({ item: [start, end], index }) => (
             <Spot
-              {...item}
+              start={start}
+              end={end}
               onPress={() => !selected && setPromptId(index)}
               id={index}
               selected={selected === index}
@@ -77,7 +84,8 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
       </View>
       <Button
         title='Cancel my booking'
-        onPress={() => dispatch({ type: 'unselect' })}
+        disabled={selected === undefined}
+        onPress={() => selected !== undefined && unselectSpot(selected)}
       />
     </View>
   );

@@ -11,14 +11,14 @@ import {
 
 import { Spot } from './components';
 
-import { getCols, getRows, Context } from '../src/reducer';
+import { getCols, getRows, Context } from '../src/firebase';
 
 import car from '../assets/car.png';
 
 export type NavigateEntryAType = {};
 
 export function NavigateEntryA({}: NavigateEntryAType) {
-  const [{ spots, selected }] = useContext(Context);
+  const { spots, selected } = useContext(Context);
   const yStep = 150;
   const xStep = (useWindowDimensions().width - 114 - getCols() * 4) / getCols();
   const yPadding = 0;
@@ -82,9 +82,10 @@ export function NavigateEntryA({}: NavigateEntryAType) {
         <FlatList
           data={spots}
           keyExtractor={(_, i) => i.toString()}
-          renderItem={({ item, index }) => (
+          renderItem={({ item: [start, end], index }) => (
             <Spot
-              {...item}
+              start={start}
+              end={end}
               id={index}
               disabled
               selected={selected === index}

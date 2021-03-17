@@ -6,14 +6,14 @@ import {
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
-import { Context } from '../src/reducer';
+import { Context } from '../src/firebase';
 
 export function NavigateEntryB() {
   const [full, setFull] = useState(false);
   const { width, height } = useWindowDimensions();
-  const [{ spots, selected }] = useContext(Context);
+  const { spots, selected } = useContext(Context);
   const hours =
-    selected !== null ? spots[selected].end - spots[selected].start : 0;
+    selected !== undefined ? spots[selected][1] - spots[selected][0] : 0;
   return (
     <TouchableOpacity style={styles.container} onPress={() => setFull(!full)}>
       <QRCode

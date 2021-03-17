@@ -11,7 +11,7 @@ import {
   NavigateEntryB,
 } from './src';
 
-import { initialState, reducer, Context } from './src/reducer';
+import { Context, useFirebase } from './src/firebase';
 
 export type StackParamList = {
   SelectParkingSlot: undefined;
@@ -23,8 +23,9 @@ export type StackParamList = {
 const Stack = createStackNavigator<StackParamList>();
 
 export default function App() {
+  const state = useFirebase();
   return (
-    <Context.Provider value={useReducer(reducer, initialState)}>
+    <Context.Provider value={state}>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen

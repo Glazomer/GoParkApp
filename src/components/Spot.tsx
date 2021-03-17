@@ -43,8 +43,12 @@ export function Spot({ id, start, end, selected, style, ...props }: SpotType) {
       disabled={color !== 'green'}
       {...props}>
       <Text>{id + 1}</Text>
-      {color !== 'green' && <Text>Start: {toLocaleTimeString(start)}</Text>}
-      {color !== 'green' && <Text>End: {toLocaleTimeString(end)}</Text>}
+      {color !== 'green' && (
+        <>
+          <Text>Start: {toLocaleTimeString(start)}</Text>
+          <Text>End: {toLocaleTimeString(end)}</Text>
+        </>
+      )}
       {selected && <Text style={styles.selected}>BOOKED</Text>}
     </TouchableOpacity>
   );
