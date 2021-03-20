@@ -2,14 +2,13 @@ import React, { useEffect, useRef, useContext } from 'react';
 import {
   View,
   Text,
-  Button,
   FlatList,
   Animated,
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
 
-import { Spot } from './components';
+import { Spot, Button } from './components';
 
 import { getCols, getRows, Context } from '../src/firebase';
 
@@ -76,7 +75,9 @@ export function NavigateEntryA({}: NavigateEntryAType) {
 
   return (
     <View style={styles.container}>
-      <Button title='Repeat' onPress={moveCar} disabled={selected === null} />
+      <Button onPress={moveCar} disabled={selected === null}>
+        Repeat
+      </Button>
       <View style={styles.parking}>
         <Text style={styles.door}>Exit</Text>
         <FlatList

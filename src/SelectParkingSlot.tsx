@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 // @ts-ignore
 import DialogInput from 'react-native-dialog-input';
 
-import { Spot } from './components';
+import { Spot, Button } from './components';
 
-import { StackParamList } from '../App';
+import { StackParamList } from '.';
 import {
   Context,
   selectSpot,
@@ -24,6 +24,9 @@ export type SelectParkingSlotType = { navigation: ProfileScreenNavigationProp };
 export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
   const { spots, selected } = useContext(Context);
   const [disabled, setDisabled] = useState(false);
+
+  const activeSelected =
+    selected !== undefined && Date.now() < spots[selected][1];
 
   function ResetBtn() {
     setDisabled(true);
@@ -52,16 +55,14 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
         textInputProps={{ keyboardType: 'number-pad' }}
       />
       <Button
-        title='My booked parking'
         onPress={() => navigation.navigate('MyBookedParking')}
-        disabled={selected === undefined}
-      />
+        disabled={!activeSelected}>
+        My booked parking
+      </Button>
       <View style={styles.delimiter} />
-      <Button
-        title='Shuffle random parking'
-        onPress={ResetBtn}
-        disabled={disabled}
-      />
+      <Button onPress={ResetBtn} disabled={disabled}>
+        Shuffle random parking
+      </Button>
       <View style={styles.parking}>
         <Text style={styles.door}>Exit</Text>
         <FlatList
@@ -73,7 +74,7 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
               end={end}
               onPress={() => !selected && setPromptId(index)}
               id={index}
-              selected={selected === index}
+              selected={activeSelected && selected === index}
               style={styles.spot}
             />
           )}
@@ -83,10 +84,10 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
         <Text style={[styles.door, { alignSelf: 'flex-end' }]}>Enter</Text>
       </View>
       <Button
-        title='Cancel my booking'
-        disabled={selected === undefined}
-        onPress={() => selected !== undefined && unselectSpot(selected)}
-      />
+        disabled={!activeSelected}
+        onPress={() => selected !== undefined && unselectSpot(selected)}>
+        Cancel my booking
+      </Button>
     </View>
   );
 }
