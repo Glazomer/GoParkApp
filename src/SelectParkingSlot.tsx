@@ -72,7 +72,7 @@ export function SelectParkingSlot({ navigation }: SelectParkingSlotType) {
             <Spot
               start={start}
               end={end}
-              onPress={() => !selected && setPromptId(index)}
+              onPress={() => !activeSelected && setPromptId(index)}
               id={index}
               selected={activeSelected && selected === index}
               style={styles.spot}
