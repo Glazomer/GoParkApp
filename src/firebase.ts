@@ -38,14 +38,14 @@ const presets = [
   ],
 ];
 
-export const newSpots = () =>
-  new Array(6).fill(0).map(() => presets[getRand(3)]());
-
-const dummySpots = new Array(6).fill(0).map(() => [0, 0]);
-export const dummyState = { selected: undefined, spots: dummySpots };
-
 export const getCols = () => 3;
-export const getRows = () => 2;
+export const getRows = () => 3;
+
+export const newSpots = () =>
+  new Array(getCols() * getRows()).fill(0).map(() => presets[getRand(3)]());
+
+const dummySpots = new Array(getCols() * getRows()).fill(0).map(() => [0, 0]);
+export const dummyState = { selected: undefined, spots: dummySpots };
 
 export type Spots = ReturnType<typeof newSpots>;
 export type State = {

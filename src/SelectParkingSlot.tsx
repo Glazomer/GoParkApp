@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   parking: {
+    flex: 1,
     backgroundColor: '#423F3C',
     width: '100%',
     padding: 10,
